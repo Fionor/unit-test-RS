@@ -38,12 +38,12 @@ const users_Schema = new mongoose.Schema({
     }
 }, { versionKey: false });
 
-teacherSchema.pre('save', function(next) {
+users_Schema.pre('save', function(next) {
     if(this.isModified('password') || this.isNew()) this.password = bcrypt.hashSync(this.password, 12);
     next();
 });
 
-teacherSchema.pre('findOneAndUpdate', function(next) {
+users_Schema.pre('findOneAndUpdate', function(next) {
     if(this._update.$set && this._update.$set.password) this.findOneAndUpdate({}, {password: bcrypt.hashSync(this._update.$set.password, 12)}); 
     next();
 });

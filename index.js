@@ -1,5 +1,12 @@
 require('dotenv').load();
 
+require('./db');
+require('./models/groups');
+require('./models/students');
+require('./models/teachers');
+require('./models/tests');
+require('./models/users');
+
 const express = require('express');
 const app = express();
 const http = require('http').Server(app, {
@@ -13,7 +20,9 @@ const logger = require('morgan');
 
 const config = require('./config');
 
-app.set('port', process.env.PORT || config.port);
+const routes = require('./routes/index');
+
+app.set('port', process.env.PORT || config.resourse_server.port);
 
 app.use(logger('dev'));
 app.use(helmet());

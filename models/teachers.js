@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const ObjectId = mongoose.Schema.ObjectId;
 
-const students_Schema = new mongoose.Schema({
+const teachers_Schema = new mongoose.Schema({
     user_id: {
         type: ObjectId,
         required: true
@@ -12,4 +12,4 @@ const students_Schema = new mongoose.Schema({
     }],
 });
 
-mongoose.model('students', students_Schema);
+mongoose.model('teachers', teachers_Schema);

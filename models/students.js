@@ -17,6 +17,6 @@ const students_Schema = new mongoose.Schema({
         questions: [Number],
         test_complited: Boolean
     }]
-});
+}, {versionKey: false});
 
 mongoose.model('students', students_Schema);

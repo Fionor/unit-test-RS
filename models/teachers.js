@@ -10,6 +10,6 @@ const teachers_Schema = new mongoose.Schema({
         _id: false,
         id: ObjectId
     }],
-});
+}, {versionKey: false});
 
 mongoose.model('teachers', teachers_Schema);

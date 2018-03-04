@@ -33,7 +33,7 @@ app.use(express.static(path.join(__dirname, 'dist')));
 app.use('/', routes);
 
 app.use(function(req, res) {
-    res.sendFile(path.join(__dirname, '..', 'dist', 'index.html'));
+    res.sendFile(path.join(__dirname, 'dist', 'index.html'));
 });
 
 const server = http.listen(app.get('port'), ()=>{

@@ -22,7 +22,7 @@ const users_Schema = new mongoose.Schema({
     },
     role_id: {
         type: ObjectId,
-        required: true
+        required: false
     },
     admin_scope: {
         type: Number,
@@ -39,7 +39,7 @@ const users_Schema = new mongoose.Schema({
 }, { versionKey: false });
 
 users_Schema.pre('save', function(next) {
-    if(this.isModified('password') || this.isNew()) this.password = bcrypt.hashSync(this.password, 12);
+    if(this.isModified('password') || this.isNew) this.password = bcrypt.hashSync(this.password, 12);
     next();
 });
 

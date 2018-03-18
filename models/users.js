@@ -3,7 +3,7 @@ const bcrypt = require('bcryptjs');
 const ObjectId = mongoose.Schema.ObjectId;
 
 const users_Schema = new mongoose.Schema({
-    FIO: {
+    fio: {
         type: String,
         required: true
     },
@@ -20,10 +20,6 @@ const users_Schema = new mongoose.Schema({
         type: String,
         required: true
     },
-    role_id: {
-        type: ObjectId,
-        required: false
-    },
     admin_scope: {
         type: Number,
         default: 0
@@ -39,12 +35,12 @@ const users_Schema = new mongoose.Schema({
 }, { versionKey: false });
 
 users_Schema.pre('save', function(next) {
-    if(this.isModified('password') || this.isNew) this.password = bcrypt.hashSync(this.password, 12);
+    if(this.isModified('password') || this.isNew) this.password = bcrypt.hashSync(this.password, 5);
     next();
 });
 
 users_Schema.pre('findOneAndUpdate', function(next) {
-    if(this._update.$set && this._update.$set.password) this.findOneAndUpdate({}, {password: bcrypt.hashSync(this._update.$set.password, 12)}); 
+    if(this._update.$set && this._update.$set.password) this.findOneAndUpdate({}, {password: bcrypt.hashSync(this._update.$set.password, 5)}); 
     next();
 });
 

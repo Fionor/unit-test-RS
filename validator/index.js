@@ -1,8 +1,28 @@
 const mongoose = require('mongoose');
 const ObjectId = mongoose.mongo.ObjectId;
+const request = require('request-promise');
+const config = require('../config');
 
-module.exports = (params, req, res, callback = (req, res) => {}) => {
+module.exports = async (params, req, res, callback = (req, res) => {}) => {
     let errors = [];
+    if(params.for_auth){
+        if ( req[params.req_type == 'GET' ? 'query' : 'body'].access_token ){
+            const check_token = await request({
+                method: 'GET',
+                url: `http://${config.oauth.url}${config.oauth.port ? `:${config.oauth.port}` : ''}/token-info`,
+                qs: {
+                    access_token: req[params.req_type == 'GET' ? 'query' : 'body'].access_token
+                },
+                json: true
+            });
+            if( check_token.status != 200 ){
+                return res.send(check_token);
+            }
+            res.token = {user: check_token.response[0].user}
+        } else {
+            return res.send({status: 401, error: {error_msg: 'invalid_token'}});
+        }
+    }
     for1: for (let i = 0; i < params.variables.length; i++) {
         const element = params.variables[i];
         switch (params.req_type) {

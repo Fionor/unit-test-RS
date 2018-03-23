@@ -6,6 +6,7 @@ require('./models/students');
 require('./models/teachers');
 require('./models/tests');
 require('./models/users');
+require('./models/photos');
 
 const express = require('express');
 const app = express();
@@ -27,7 +28,7 @@ app.set('port', process.env.PORT || config.resourse_server.port);
 app.use(logger('dev'));
 app.use(helmet());
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'dist')));
 
 app.use('/', routes);

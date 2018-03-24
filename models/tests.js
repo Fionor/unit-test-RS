@@ -2,30 +2,27 @@ const mongoose = require('mongoose');
 const ObjectId = mongoose.Schema.ObjectId;
 
 const tests_Schema = new mongoose.Schema({
-    teacher: {
-        type: ObjectId,
+    for_groups: {
+        type: Array,
         required: true
     },
-    forGroups: [],
     name: {
         type: String,
         required: true
     },
-    date: {
+    created_at: {
         type: Date,
-        required: true
+        default: Date.now
     },
     subscribers: [ObjectId],
-    questionsCount: {
-        type: Number,
-        required: true
-    },
     state: {
         type: String,
-        required: false,
         default: 'not_defined'
     },
-    variants:[]
+    variants: {
+        type: Array,
+        required: true
+    }
 }, { versionKey: false });
 
 mongoose.model('tests', tests_Schema);

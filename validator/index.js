@@ -59,6 +59,50 @@ module.exports = async (params, req, res, callback = (req, res) => {}) => {
                             errors.push({error: {error_msg: `${element.parametr} is not file `}});
                             continue for1;
                         }
+                    } else {
+                        if( req.body[element.parametr] == null ){
+                            errors.push({error: {error_msg: `${element.parametr} not found`}});
+                            continue for1;
+                        }
+                        if( element.type == 'string' ){
+                            if( typeof req.body[element.parametr] != 'string' ){
+                                errors.push({error: {error_msg: `${element.parametr} is not string`}});
+                                continue for1;
+                            }
+                            if ( req.body[element.parametr] == '' ) {
+                                errors.push({error: {error_msg: `${element.parametr} is empty`}});
+                                continue for1;
+                            }
+                        } else if (element.type == 'array') {
+                            if ( !Array.isArray(req.body[element.parametr]) ){
+                                errors.push({error: {error_msg: `${element.parametr} is not array`}});
+                                continue for1;
+                            }
+                            if( req.body[element.parametr].length == 0 ){
+                                errors.push({error: {error_msg: `${element.parametr} is empty`}});
+                                continue for1;
+                            }
+                            req.body[element.parametr].forEach(array_item => {
+                                switch (element.array_item) {
+                                    case 'string':
+                                        if( typeof array_item !== 'string' ){
+                                            errors.push({error: {error_msg: `${element.parametr} has not string item`}});
+                                        }
+                                        else if ( array_item == '' ) {
+                                            errors.push({error: {error_msg: `${element.parametr} has empty item`}});
+                                        }
+                                        break;
+                                    case 'object':
+                                        if (Object.prototype.toString.call(array_item) !== "[object Object]"){
+                                            errors.push({error: {error_msg: `${element.parametr} has not object item`}});
+                                        }
+                                        break;
+                                    default:
+                                        break;
+                                }     
+                            });
+                            
+                        }
                     }
                     break;
             }

@@ -20,7 +20,7 @@ module.exports.create = async (req, res) => {
                 if(req.body.variants[i].questions[j].name == undefined || req.body.variants[i].questions[j].name == ''){
                     errors.push(`Variant ${i+1} -> Question ${j+1}: missing question name`);
                 }
-                if(req.body.variants[i].questions[j].image_id == undefined || !ObjectId.isValid(req.body.variants[i].questions[j].image_id)){
+                if(req.body.variants[i].questions[j].image_id == undefined || ( req.body.variants[i].questions[j].image_id != '' && !ObjectId.isValid(req.body.variants[i].questions[j].image_id) )){
                     errors.push(`Variant ${i+1} -> Question ${j+1}: image_id undefined ("" || "objectId")`);
                 }
                 if(req.body.variants[i].questions[j].answers == undefined || req.body.variants[i].questions[j].answers.length == 0){

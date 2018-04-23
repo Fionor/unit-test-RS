@@ -47,7 +47,7 @@ module.exports = async (params, req, res, callback = (req, res) => {}) => {
                         }
                     } else if( element.type == 'objectid' ){
                         if(!ObjectId.isValid(req.query[element.parametr])){
-                            errors.push({error: {error_msg: `${req.query[element.parametr]} is not objectid `}});
+                            errors.push({error: {error_msg: `${element.parametr} is not objectid `}});
                             continue for1;
                         }
                     }
@@ -72,6 +72,10 @@ module.exports = async (params, req, res, callback = (req, res) => {}) => {
                             if ( req.body[element.parametr] == '' ) {
                                 errors.push({error: {error_msg: `${element.parametr} is empty`}});
                                 continue for1;
+                            }
+                        } else if (element.type == 'number') {
+                            if( typeof req.body[element.parametr] != 'number' ){
+                                errors.push({error: {error_msg: `${element.parametr} is not number`}});
                             }
                         } else if (element.type == 'array') {
                             if ( !Array.isArray(req.body[element.parametr]) ){
@@ -102,6 +106,11 @@ module.exports = async (params, req, res, callback = (req, res) => {}) => {
                                 }     
                             });
                             
+                        } else if( element.type == 'objectid' ){
+                            if(!ObjectId.isValid(req.body[element.parametr])){
+                                errors.push({error: {error_msg: `${element.parametr} is not objectid `}});
+                                continue for1;
+                            }
                         }
                     }
                     break;

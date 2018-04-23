@@ -19,6 +19,9 @@ module.exports = async (params, req, res, callback = (req, res) => {}) => {
                 if( check_token.status != 200 ){
                     return res.send(check_token);
                 }
+                if( !check_token.response[0].user.verified ){
+                    return res.send({status: 401, error: {error_msg: 'user is not verified'}})
+                }
                 res.token = {user: check_token.response[0].user}
             } else {
                 return res.send({status: 401, error: {error_msg: 'invalid_token'}});
@@ -122,7 +125,7 @@ module.exports = async (params, req, res, callback = (req, res) => {}) => {
             callback(req, res);
         }
     } catch (error) {
-        console.log('validator ERROR', error)
+        console.error('validator ERROR', JSON.stringify(error));
     }
     
 }

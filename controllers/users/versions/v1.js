@@ -23,7 +23,7 @@ module.exports.get = async (req, res) => {
         const users = await User.find({_id: {'$in': user_ids}}).exec();
         if(!users) return res.send({status: 200, response: []});
         let response = users.reduce((prev, curr) => {
-            return [...prev, {user: {id: curr._id, fio: curr.fio, role: curr.role, admin_scope: curr.admin_scope}}];
+            return [...prev, {user: {id: curr._id, fio: curr.fio, role: curr.role, admin_scope: curr.admin_scope, verified: curr.verified}}];
         }, [])
         return res.send({status: 200, response: response});
     } catch (error) {

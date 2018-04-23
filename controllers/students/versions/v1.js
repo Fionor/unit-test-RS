@@ -9,6 +9,9 @@ module.exports.set_answer = async (req, res) => {
             return res.send({status: 401, error: {error_msg: "invalid role"}});
         }
         const test = await Tests.findOne({_id: req.body.test_id}).lean().exec();
+        if(test.state == 'not_defined'){
+            return res.send({status: 400, error: {error_msg: 'test not defined'}})
+        }
         let student = await Students.findOne({user_id: res.token.user.id}).lean().exec();
         const subscribed_test = student.testsSubscribes.filter(test => test.test_id);
         if(subscribed_test.length == 0){

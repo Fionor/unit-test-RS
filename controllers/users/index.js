@@ -1,6 +1,6 @@
 const version1 = require('./versions/v1');
 const validator = require('../../validator/');
-
+const config = require('../../config')
 // GET
 module.exports.get = (req, res) => {
     switch (String(req.query.v)) {
@@ -46,11 +46,10 @@ module.exports.password_check = (req, res) => {
 }
 
 //POST
-
 module.exports.set_permissions = (req, res) => {
     switch (String(req.body.v)) {
         case '1':
-            validator({req_type: 'POST', for_auth: true,
+            validator({req_type: 'POST', for_auth: true, permissions: [config.admin_permissions.ACCESS_ADMIN],
                 variables: [
                     {
                         parametr: 'permissions',

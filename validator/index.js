@@ -22,6 +22,9 @@ module.exports = async (params, req, res, callback = (req, res) => {}) => {
                 if( !check_token.response[0].user.verified ){
                     return res.send({status: 401, error: {error_msg: 'user is not verified'}})
                 }
+                if(params.for_role && check_token.response[0].user.role != params.for_role){
+                    return res.send({status: 401, error: {error_msg: 'invalid role'}})
+                }
                 res.token = {user: check_token.response[0].user}
             } else {
                 return res.send({status: 401, error: {error_msg: 'invalid_token'}});
@@ -93,15 +96,18 @@ module.exports = async (params, req, res, callback = (req, res) => {}) => {
                                 switch (element.array_item) {
                                     case 'string':
                                         if( typeof array_item !== 'string' ){
-                                            errors.push({error: {error_msg: `${element.parametr} has not string item`}});
+                                            errors.push({error: {error_msg: `${element.parametr} is not string item`}});
                                         }
                                         else if ( array_item == '' ) {
-                                            errors.push({error: {error_msg: `${element.parametr} has empty item`}});
+                                            errors.push({error: {error_msg: `${element.parametr} is empty item`}});
                                         }
                                         break;
                                     case 'object':
                                         if (Object.prototype.toString.call(array_item) !== "[object Object]"){
-                                            errors.push({error: {error_msg: `${element.parametr} has not object item`}});
+                                            errors.push({error: {error_msg: `${element.parametr} is not object item`}});
+                                        }
+                                        if (Object.keys(array_item).length == 0){
+                                            errors.push({error: {error_msg: `${element.parametr} is empty`}});
                                         }
                                         break;
                                     default:
@@ -110,7 +116,7 @@ module.exports = async (params, req, res, callback = (req, res) => {}) => {
                             });
                             
                         } else if( element.type == 'objectid' ){
-                            if(!ObjectId.isValid(req.body[element.parametr])){
+                            if(Object.prototype.toString.call(req.body[element.parametr]) !== '[object String]' || !ObjectId.isValid(req.body[element.parametr])){
                                 errors.push({error: {error_msg: `${element.parametr} is not objectid `}});
                                 continue for1;
                             }

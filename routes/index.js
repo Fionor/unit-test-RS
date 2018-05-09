@@ -11,8 +11,11 @@ const ctrl_photos = require('../controllers/photos/');
 router.get('/users.get', ctrl_users.get);
 router.get('/users.password_check', ctrl_users.password_check);
 router.post('/users.create', ctrl_users.create);
+router.post('/users.set_permissions', ctrl_users.set_permissions);
 
 router.post('/tests.create', ctrl_tests.create);
+router.post('/tests.begin_testing', ctrl_tests.begin_testing);
+router.post('/tests.end_testing', ctrl_tests.end_testing);
 
 router.get('/photos.get', ctrl_photos.get);
 router.post('/photos.create', upload.fields([{name: 'photo'}]), ctrl_photos.create);

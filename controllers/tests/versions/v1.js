@@ -4,6 +4,7 @@ const Tests = mongoose.model('tests');
 const Photos = mongoose.model('photos');
 const Teachers = mongoose.model('teachers');
 
+//POST
 module.exports.create = async (req, res) => {
     try {
         if( res.token.user.role != 'teacher' ) {
@@ -66,7 +67,46 @@ module.exports.create = async (req, res) => {
         await Teachers.findOneAndUpdate({user_id: res.token.user.id}, {"$push": {created_tests: {id: test._id}}}).exec();
         return res.send({status: 200, response: [{test_id: test._id}]}); 
     } catch (error) {
-        console.log('tests.create', error);
+        console.error('tests.create', error);
         res.send({status: 500, error: {error_msg: error}});
+    }
+}
+
+//POST
+module.exports.begin_testing = async (req, res) => {
+    try {
+        const test = await Tests.findById(req.body.id).exec();
+        
+        if(test == null) {
+            return res.send({status: 400, errors: [{error_msg: 'invalid test id'}]});
+        } else if (test.state != "not_defined") {
+            return res.send({status: 400, errors: [{error_msg: 'invalid test state'}]});
+        } else {
+            test.state = "in_progress";
+            await test.save();
+            return res.send({status: 200, response: [{test_id: test._id}]});
+        }
+    } catch (error) {
+        console.error('tests.begin_testing', error);
+        res.send({status: 500, error: {error_msg: JSON.stringify(error)}});
+    }
+}
+
+//POST
+module.exports.end_testing = async (req, res) => {
+    try {
+        const test = await Tests.findById(req.body.id).exec();
+        if(test == null) {
+            return res.send({status: 400, errors: [{error_msg: 'invalid test id'}]});
+        } else if (test.state != "in_progress") {
+            return res.send({status: 400, errors: [{error_msg: 'invalid test state'}]});
+        } else {
+            test.state = "complited";
+            await test.save();
+            return res.send({status: 200, response: [{test_id: test._id}]});
+        }
+    } catch (error) {
+        console.error('tests.end_testing', error);
+        res.send({status: 500, error: {error_msg: JSON.stringify(error)}});
     }
 }

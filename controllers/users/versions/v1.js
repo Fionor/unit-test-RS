@@ -27,7 +27,7 @@ module.exports.get = async (req, res) => {
         }, [])
         return res.send({status: 200, response: response});
     } catch (error) {
-        console.log('users.get', error);
+        console.error('users.get', error);
         res.send(500, error);
     }
     
@@ -63,7 +63,7 @@ module.exports.create = async (req, res) => {
             return res.send({status: 400, error: {error_msg: 'invalid_onetime_token'}});
         }
     } catch (error) {
-        console.log('users.create', error);
+        console.error('users.create', error);
         res.send({status: 500, error: {error_msg: error}});
     }
 }
@@ -90,7 +90,35 @@ module.exports.password_check = async (req, res) => {
             return res.send({status: 400, error: {error_msg: 'invalid_onetime_token'}});
         }
     } catch (error) {
-        console.log('password_check', error)
+        console.error('users.password_check', error)
+        res.send({status: 500, error: {error_msg: error}});
+    }
+}
+
+module.exports.set_permissions = async (req, res) => {
+    try {
+        let admin = await User.findById(res.token.user.id).exec();
+        console.log(admin);
+        if( Number(admin.admin_scope & config.admin_permissions.ACCESS_ADMIN) != config.admin_permissions.ACCESS_ADMIN) {
+            return res.send({status: 401, error: [{error_msg: 'permission denied'}]});
+        }
+        const errors = req.body.permissions.map(permission => {
+            if(Object.keys(config.admin_permissions).indexOf(permission) == -1) return {permission, error_msg: 'invalid type'};
+        });
+
+        if(errors[0] != null) {
+            return res.send({status: 400, errors});
+        }
+
+        const user = await User.findById(req.body.user_id).exec();
+        req.body.permissions.forEach(permission => {
+            user.admin_scope = user.admin_scope ^ config.admin_permissions[permission];
+        })
+        await user.save();
+
+        return res.send({status: 200, response: [{user_id: req.body.user_id}]});
+    } catch (error) {
+        console.error('users.set_permissions', error)
         res.send({status: 500, error: {error_msg: error}});
     }
 }

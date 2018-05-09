@@ -44,3 +44,28 @@ module.exports.password_check = (req, res) => {
         break;
     }
 }
+
+//POST
+
+module.exports.set_permissions = (req, res) => {
+    switch (String(req.body.v)) {
+        case '1':
+            validator({req_type: 'POST', for_auth: true,
+                variables: [
+                    {
+                        parametr: 'permissions',
+                        type: 'array',
+                        array_item: 'string'
+                    },
+                    {
+                        parametr: 'user_id',
+                        type: 'objectid'
+                    }
+                ]
+            }, req, res, version1.set_permissions);
+        break;
+        default:
+            return res.send({status: 400, error: {error_msg: "invalid version"}});
+        break;
+    }
+}

@@ -19,8 +19,8 @@ module.exports = {
 
 /*--------------------
 ACCESS_VERIFICATION_PASSWORD - змога підтверджувати зміну паролю
-ACCESS_VERIFICATION_ACCOUNT - змога підтверджувати аккаунт
-ACCESS_CREATE_GROUPS - змога створювати групи
-ACCESS_DELETE_ACCOUNTS - змога видаляти акаунти
-ACCESS_ADMIN - змога встановлювати доступи
+ACCESS_VERIFICATION_ACCOUNT  - змога підтверджувати аккаунт
+ACCESS_CREATE_GROUPS         - змога створювати групи
+ACCESS_DELETE_ACCOUNTS       - змога видаляти акаунти
+ACCESS_ADMIN                 - змога встановлювати доступи
 --------------------*/

@@ -68,3 +68,19 @@ module.exports.set_permissions = (req, res) => {
         break;
     }
 }
+
+//GET
+module.exports.get_unverified_users = (req, res) => {
+    switch (String(req.query.v)) {
+        case '1':
+            validator({req_type: 'GET', for_auth: true, permissions: [config.admin_permissions.ACCESS_VERIFICATION_ACCOUNT],
+                variables: [
+                    
+                ]
+            }, req, res, version1.get_unverified_users);
+        break;
+        default:
+            return res.send({status: 400, error: {error_msg: "invalid version"}});
+        break;
+    }
+}

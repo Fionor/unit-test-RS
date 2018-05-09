@@ -98,10 +98,6 @@ module.exports.password_check = async (req, res) => {
 module.exports.set_permissions = async (req, res) => {
     try {
         let admin = await User.findById(res.token.user.id).exec();
-        console.log(admin);
-        // if( Number(admin.admin_scope & config.admin_permissions.ACCESS_ADMIN) != config.admin_permissions.ACCESS_ADMIN) {
-        //     return res.send({status: 401, error: [{error_msg: 'permission denied'}]});
-        // }
         const errors = req.body.permissions.map(permission => {
             if(Object.keys(config.admin_permissions).indexOf(permission) == -1) return {permission, error_msg: 'invalid type'};
         });
@@ -119,6 +115,28 @@ module.exports.set_permissions = async (req, res) => {
         return res.send({status: 200, response: [{user_id: req.body.user_id}]});
     } catch (error) {
         console.error('users.set_permissions', error)
+        res.send({status: 500, error: {error_msg: error}});
+    }
+}
+
+module.exports.get_unverified_users = async (req, res) => {
+    try {
+        let users = await User.find({verified: false}).exec();
+        let response = await Promise.all(users.map(async user => {
+            let user_data = {
+                id: user._id,
+                fio: user.fio,
+                role: user.role
+            }
+            if(user.role == 'student'){
+                let student = await Student.findOne({user_id: user._id}).exec();
+                user_data.group = student.group
+            }
+            return user_data
+        }));
+        return res.send({status: 200, response}) 
+    } catch (error) {
+        console.error('users.get_unverified_users', error)
         res.send({status: 500, error: {error_msg: error}});
     }
 }

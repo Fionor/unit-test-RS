@@ -64,6 +64,15 @@ module.exports = async (params, req, res, callback = (req, res) => {}) => {
                             errors.push({error: {error_msg: `${element.parametr} is not objectid `}});
                             continue for1;
                         }
+                    } else if( element.type == 'string' ){
+                        if( typeof req.query[element.parametr] != 'string' ){
+                            errors.push({error: {error_msg: `${element.parametr} is not string`}});
+                            continue for1;
+                        }
+                        if ( req.query[element.parametr] == '' ) {
+                            errors.push({error: {error_msg: `${element.parametr} is empty`}});
+                            continue for1;
+                        }
                     }
                     break;
                 case "POST":

@@ -33,6 +33,60 @@ module.exports.get = async (req, res) => {
     
 }
 
+//GET
+module.exports.get_recovery_password_status = async (req, res) => {
+    try {
+        const user = await User.findOne({username: req.query.username}).exec();
+        if(user) {
+            return res.send({status: 200, response: [{
+                recovery_status: user.change_password
+            }]})
+        } else {
+            return res.send({status: 400, errors: [{error_msg: 'invalid username'}]})
+        }
+    } catch (error) {
+        console.error('users.get_recovery_password_status', error);
+        res.send(500, error);
+    }
+}
+
+//POST
+module.exports.recovery_password = async (req, res) => {
+    try {
+        const user = await User.findOne({username: req.body.username}).exec();
+        if(user){
+            if(req.body.code == 2){
+                if(user.change_password == 2){
+                    if(!req.body.password || req.body.password.length < 6 || !req.body.password.match(/^\w+$/)){
+                        return res.send({status: 400, errors: [{error_msg: 'invalid passwrod (length > 5, match(\\w))'}]})
+                    }
+                    user.password = req.body.password;
+                    user.change_password = 0;
+                    await user.save();
+                    return res.send({status: 200, response: []})
+                } else {
+                    return res.send({status: 400, errors: [{error_msg: 'invalid user change password status'}]})
+                }
+            } else if(req.body.code == 1) {
+                if(user.change_password == 0){
+                    user.change_password = 1;
+                    await user.save();
+                    return res.send({status: 200, response: []})
+                } else {
+                    return res.send({status: 400, errors: [{error_msg: 'invalid user change password status'}]})
+                }
+            } else {
+                return res.send({status: 400, errors: [{error_msg: 'invalid code value (1 or 2)'}]})
+            }
+        } else {
+            return res.send({status: 400, errors: [{error_msg: 'invalid username'}]})
+        }
+    } catch (error) {
+        console.error('users.recovery_password', error);
+        res.send(500, error);
+    }
+}
+
 // POST
 module.exports.create = async (req, res) => {
     try {

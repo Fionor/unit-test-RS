@@ -10,9 +10,11 @@ const ctrl_photos = require('../controllers/photos/');
 
 router.get('/users.get', ctrl_users.get);
 router.get('/users.password_check', ctrl_users.password_check);
-router.get('/users.get_unverified_users', ctrl_users.get_unverified_users)
+router.get('/users.get_unverified_users', ctrl_users.get_unverified_users);
+router.get('/users.get_recovery_password_status', ctrl_users.get_recovery_password_status);
 router.post('/users.create', ctrl_users.create);
 router.post('/users.set_permissions', ctrl_users.set_permissions);
+router.post('/users.recovery_password', ctrl_users.recovery_password);
 
 router.post('/tests.create', ctrl_tests.create);
 router.post('/tests.begin_testing', ctrl_tests.begin_testing);

@@ -21,6 +21,48 @@ module.exports.get = (req, res) => {
     }
 }
 
+//GET
+module.exports.get_recovery_password_status = (req, res) => {
+    switch (String(req.query.v)) {
+        case '1':
+            validator({req_type: 'GET',
+                variables: [
+                    {
+                        parametr: 'username',
+                        type: 'string'
+                    }
+                ]
+            }, req, res, version1.get_recovery_password_status);
+        break;
+        default:
+            return res.send({status: 400, error: {error_msg: "invalid version"}});
+        break;
+    }
+}
+
+//POST
+module.exports.recovery_password = (req, res) => {
+    switch (String(req.body.v)) {
+        case '1':
+            validator({req_type: 'POST',
+                variables: [
+                    {
+                        parametr: 'username',
+                        type: 'string'
+                    },
+                    {
+                        parametr: 'code',
+                        type: 'number'
+                    }
+                ]
+            }, req, res, version1.recovery_password);
+        break;
+        default:
+            return res.send({status: 400, error: {error_msg: "invalid version"}});
+        break;
+    }
+}
+
 // POST
 module.exports.create = (req, res) => {
     switch (String(req.body.v)) {

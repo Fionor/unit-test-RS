@@ -71,6 +71,16 @@ module.exports.recovery_password = async (req, res) => {
                 if(user.change_password == 0){
                     user.change_password = 1;
                     await user.save();
+                    //log out
+                    await request({
+                        method: 'GET',
+                        url: `http://${config.oauth.url}${config.oauth.port ? `:${config.oauth.port}` : ''}/logout`,
+                        qs: {
+                            access_token: req.body.access_token,
+                            all: 1
+                        },
+                        json: true
+                    });
                     return res.send({status: 200, response: []})
                 } else {
                     return res.send({status: 400, errors: [{error_msg: 'invalid user change password status'}]})
@@ -83,6 +93,36 @@ module.exports.recovery_password = async (req, res) => {
         }
     } catch (error) {
         console.error('users.recovery_password', error);
+        res.send(500, error);
+    }
+}
+
+//POST
+module.exports.change_password = async (req, res) => {
+    try {
+        let user = await User.findById(res.token.user.id).exec();
+        if(bcrypt.compareSync(req.body.password, user.password)){
+            if(req.body.new_password.length < 6 || !req.body.new_password.match(/^\w+$/)){
+                return res.send({status: 400, errors: [{error_msg: 'invalid new passwrod (length > 5, match(\\w))'}]})
+            }
+            user.password = req.body.new_password;
+            await user.save();
+            //log out
+            await request({
+                method: 'GET',
+                url: `http://${config.oauth.url}${config.oauth.port ? `:${config.oauth.port}` : ''}/logout`,
+                qs: {
+                    access_token: req.body.access_token,
+                    all: 1
+                },
+                json: true
+            });
+            return res.send({status: 200, response: []});
+        } else {
+            return res.send({status: 400, errors: [{error_msg: 'invalid old password'}]});
+        }
+    } catch (error) {
+        console.error('users.change_password', error);
         res.send(500, error);
     }
 }

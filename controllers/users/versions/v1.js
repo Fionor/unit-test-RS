@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const User = mongoose.model('users');
 const Teacher = mongoose.model('teachers');
 const Student = mongoose.model('students');
+const Group = mongoose.model('groups');
 const request = require('request-promise');
 const config = require('../../../config');
 const ObjectId = mongoose.mongo.ObjectId;
@@ -238,13 +239,40 @@ module.exports.get_unverified_users = async (req, res) => {
             }
             if(user.role == 'student'){
                 let student = await Student.findOne({user_id: user._id}).exec();
-                user_data.group = student.group
+                let group = await Group.findById(student.group_id).exec();
+                user_data.group = group;
             }
             return user_data
         }));
         return res.send({status: 200, response}) 
     } catch (error) {
         console.error('users.get_unverified_users', error)
+        res.send({status: 500, error: {error_msg: error}});
+    }
+}
+
+module.exports.verification = async (req, res) => {
+    try {
+        const user = await User.findById(req.body.id).exec();
+        if(user && !user.verified){
+            if(req.body.command == 'set') {
+                user.verified = true;
+                await user.save();
+            } else if(req.body.command == 'delete') {
+                if(user.role == 'teacher'){
+                    await Teacher.deleteOne({user_id: user._id}).exec();
+                } else {
+                    await Student.deleteOne({user_id: user._id}).exec();
+                }
+                await user.remove();
+            }
+            return res.send({status: 200, response: [{user_id: user._id}]});
+        } else {
+            return res.send({status: 400, errors: [{error_msg: 'invalid user'}]})
+        }
+
+    } catch (error) {
+        console.error('users.verification', error)
         res.send({status: 500, error: {error_msg: error}});
     }
 }

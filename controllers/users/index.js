@@ -126,3 +126,26 @@ module.exports.get_unverified_users = (req, res) => {
         break;
     }
 }
+
+//POST
+module.exports.verification = (req, res) => {
+    switch (String(req.body.v)) {
+        case '1':
+            validator({req_type: 'POST', for_auth: true, permissions: [config.admin_permissions.ACCESS_VERIFICATION_ACCOUNT],
+                variables: [
+                    {
+                        parametr: 'command',
+                        type: 'string'
+                    },
+                    {
+                        parametr: 'id',
+                        type: 'objectid'
+                    }
+                ]
+            }, req, res, version1.verification);
+        break;
+        default:
+            return res.send({status: 400, error: {error_msg: "invalid version"}});
+        break;
+    }
+}

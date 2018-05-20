@@ -143,6 +143,20 @@ module.exports.create = async (req, res) => {
             if( user ) {
                 return res.send({status: 400, error: {error_msg: 'invalid_username'}});
             }
+            if(
+                !req.body.fio.match(/^[А-яіїєыЫІЇЄ]+\s[А-яіїєыЫІЇЄ]+\s[А-яіїєыЫІЇЄ]+$/) ||
+                req.body.username.length < 4 ||
+                !req.body.username.match(/^\w+$/) ||
+                req.body.role == '' ||
+                (req.body.role == 'student' && !ObjectId.isValid(req.body.group_id)) ||
+                req.body.password.length < 6 ||
+                !req.body.password.match(/^\w+$/)
+            ) {
+                return res.send({status: 400, errors: [
+                    {error_msg: 'invalid user data'}
+                ]})
+            }
+
             let new_user = await User.create({fio: req.body.fio, username: req.body.username, password: req.body.password,
                 role: req.body.role});
             let new_role;
@@ -154,7 +168,7 @@ module.exports.create = async (req, res) => {
 
             return res.send({status: 200, user_id: new_user._id});
         } else {
-            return res.send({status: 400, error: {error_msg: 'invalid_onetime_token'}});
+            return res.send({status: 401, error: {error_msg: 'invalid_onetime_token'}});
         }
     } catch (error) {
         console.error('users.create', error);

@@ -6,8 +6,8 @@ const students_Schema = new mongoose.Schema({
         type: ObjectId,
         required: true
     },
-    group: {
-        type: String,
+    group_id: {
+        type: ObjectId,
         required: true
     },
     testsSubscribes: [{

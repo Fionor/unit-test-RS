@@ -7,6 +7,7 @@ const ctrl_users = require('../controllers/users/');
 const ctrl_students = require('../controllers/students');
 const ctrl_tests = require('../controllers/tests/');
 const ctrl_photos = require('../controllers/photos/');
+const ctrl_groups = require('../controllers/groups');
 
 router.get('/users.get', ctrl_users.get);
 router.get('/users.password_check', ctrl_users.password_check);
@@ -25,6 +26,10 @@ router.post('/photos.create', upload.fields([{name: 'photo'}]), ctrl_photos.crea
 
 router.post('/students.begin_testing', ctrl_students.begin_testing);
 router.post('/students.set_answer', ctrl_students.set_answer);
+
+router.get('/groups.get', ctrl_groups.get);
+router.post('/groups.create', ctrl_groups.create);
+router.post('/groups.delete', ctrl_groups.delete);
 
 
 module.exports = router;

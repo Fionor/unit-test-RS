@@ -147,7 +147,7 @@ module.exports.create = async (req, res) => {
                 role: req.body.role});
             let new_role;
             if( req.body.role == 'student' ) {
-                new_role = await Student.create({user_id: new_user._id, group: req.body.group});
+                new_role = await Student.create({user_id: new_user._id, group_id: req.body.group_id});
             } else {
                 new_role = await Teacher.create({user_id: new_user._id});
             }

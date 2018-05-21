@@ -51,6 +51,29 @@ module.exports.get_recovery_password_status = async (req, res) => {
     }
 }
 
+//GET
+module.exports.get_recovery_users = async (req, res) => {
+    try {
+        let users = await User.find({change_password: 1}).exec();
+        let response = await Promise.all(users.map(async user => {
+            let user_data = {
+                id: user._id,
+                fio: user.fio,
+                role: user.role
+            }
+            if(user.role == 'student'){
+                let student = await Student.findOne({user_id: user._id}).exec();
+                let group = await Group.findById(student.group_id).exec();
+                user_data.group = group;
+            }
+            return user_data
+        }));
+        return res.send({status: 200, response}) 
+    } catch (error) {
+        console.error('users.get_recovery_users', error);
+        res.send(500, error);
+    }
+}
 //POST
 module.exports.recovery_password = async (req, res) => {
     try {
@@ -104,7 +127,7 @@ module.exports.change_password = async (req, res) => {
         let user = await User.findById(res.token.user.id).exec();
         if(bcrypt.compareSync(req.body.password, user.password)){
             if(req.body.new_password.length < 6 || !req.body.new_password.match(/^\w+$/)){
-                return res.send({status: 400, errors: [{error_msg: 'invalid new passwrod (length > 5, match(\\w))'}]})
+                return res.send({status: 400, errors: [{error_msg: 'invalid new password (length > 5, match(\\w))'}]})
             }
             user.password = req.body.new_password;
             await user.save();
@@ -251,6 +274,7 @@ module.exports.get_unverified_users = async (req, res) => {
     }
 }
 
+//POST
 module.exports.verification = async (req, res) => {
     try {
         const user = await User.findById(req.body.id).exec();
@@ -273,6 +297,27 @@ module.exports.verification = async (req, res) => {
 
     } catch (error) {
         console.error('users.verification', error)
+        res.send({status: 500, error: {error_msg: error}});
+    }
+}
+
+//POST
+module.exports.recovery = async (req, res) => {
+    try {
+        const user = await User.findById(req.body.id).exec();
+        if(user && user.change_password == 1){
+            if(req.body.command == 'set') {
+                user.change_password = 2;
+            } else if(req.body.command == 'delete') {
+                user.change_password = 0
+            }
+            await user.save();
+            return res.send({status: 200, response: [{user_id: user._id}]});
+        } else {
+            return res.send({status: 400, errors: [{error_msg: 'invalid user'}]})
+        }
+    } catch (error) {
+        console.error('users.recovery', error)
         res.send({status: 500, error: {error_msg: error}});
     }
 }

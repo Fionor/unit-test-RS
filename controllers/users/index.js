@@ -40,6 +40,22 @@ module.exports.get_recovery_password_status = (req, res) => {
     }
 }
 
+//GET
+module.exports.get_recovery_users = (req, res) => {
+    switch (String(req.query.v)) {
+        case '1':
+            validator({req_type: 'GET', for_auth: true, permissions: [config.admin_permissions.ACCESS_VERIFICATION_PASSWORD],
+                variables: [
+                    
+                ]
+            }, req, res, version1.get_recovery_users);
+        break;
+        default:
+            return res.send({status: 400, error: {error_msg: "invalid version"}});
+        break;
+    }
+}
+
 //POST
 module.exports.recovery_password = (req, res) => {
     switch (String(req.body.v)) {
@@ -143,6 +159,29 @@ module.exports.verification = (req, res) => {
                     }
                 ]
             }, req, res, version1.verification);
+        break;
+        default:
+            return res.send({status: 400, error: {error_msg: "invalid version"}});
+        break;
+    }
+}
+
+//POST
+module.exports.recovery = (req, res) => {
+    switch (String(req.body.v)) {
+        case '1':
+            validator({req_type: 'POST', for_auth: true, permissions: [config.admin_permissions.ACCESS_VERIFICATION_PASSWORD],
+                variables: [
+                    {
+                        parametr: 'command',
+                        type: 'string'
+                    },
+                    {
+                        parametr: 'id',
+                        type: 'objectid'
+                    }
+                ]
+            }, req, res, version1.recovery);
         break;
         default:
             return res.send({status: 400, error: {error_msg: "invalid version"}});

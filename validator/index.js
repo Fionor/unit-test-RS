@@ -7,12 +7,12 @@ module.exports = async (params, req, res, callback = (req, res) => {}) => {
     try {
         let errors = [];
         if(params.for_auth){
-            if ( req[params.req_type == 'GET' ? 'query' : 'body'].access_token ){
+            if ( req.query.access_token ){
                 const check_token = await request({
                     method: 'GET',
                     url: `http://${config.oauth.url}${config.oauth.port ? `:${config.oauth.port}` : ''}/token-info`,
                     qs: {
-                        access_token: req[params.req_type == 'GET' ? 'query' : 'body'].access_token
+                        access_token: req.query.access_token
                     },
                     json: true
                 });

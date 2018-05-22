@@ -15,6 +15,12 @@ module.exports.get = async (req, res) => {
 // POST
 module.exports.create = async (req, res) => {
     try {
+        const directory = path.join(__dirname, '..', '..', '..', 'resource_files');
+        try {
+            fs.statSync(directory);
+        } catch(e) {
+            fs.mkdirSync(directory);
+        }
         const file = req.files.photo[0];
         const hash = crypto.createHash('md5');
         const read_stream = new stream.PassThrough();
@@ -25,16 +31,16 @@ module.exports.create = async (req, res) => {
             const md5_hash = hash.read();
             const hash_photo = await Photos.findOne({md5_hash}).exec();
             if( hash_photo != void(0) ){
-                return res.send({status: 200, response: [{photo_id: hash_photo._id}]});
+                return res.send({status: 200, response: [{photo_id: hash_photo._id, used: true}]});
             } else {
                 const new_file_name = crypto.randomBytes(20).toString('hex') + 
                     '.' + 
                     file.originalname.match(/\.([a-zA-Z]+)$/)[1];
                 const src = `/resource_files/${new_file_name}`;
-                fs.writeFile(path.join(__dirname, '..', '..', '..', src), file.buffer, async (err) => {
+                fs.writeFile(path.join(directory, new_file_name), file.buffer, async (err) => {
                     if(err) return res.send({status: 500, error: {error_msg: err}});
                     const photo = await Photos.create({src: src, md5_hash});
-                    return res.send({status: 200, response: [{photo_id: photo._id}]});
+                    return res.send({status: 200, response: [{photo_id: photo._id, used: false}]});
                 })
             }
         });

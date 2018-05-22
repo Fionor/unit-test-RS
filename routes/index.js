@@ -20,6 +20,7 @@ router.post('/users.recovery_password', ctrl_users.recovery_password);
 router.post('/users.verification', ctrl_users.verification);
 router.post('/users.recovery', ctrl_users.recovery);
 
+router.get('/tests.get_created', ctrl_tests.get_created);
 router.post('/tests.create', ctrl_tests.create);
 router.post('/tests.begin_testing', ctrl_tests.begin_testing);
 router.post('/tests.end_testing', ctrl_tests.end_testing);

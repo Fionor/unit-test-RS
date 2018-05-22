@@ -6,10 +6,10 @@ const teachers_Schema = new mongoose.Schema({
         type: ObjectId,
         required: true
     },
-    created_tests: [{
-        _id: false,
-        id: ObjectId
-    }],
+    created_tests: {
+        type: Array,
+        default: []
+    },
 }, {versionKey: false});
 
 mongoose.model('teachers', teachers_Schema);

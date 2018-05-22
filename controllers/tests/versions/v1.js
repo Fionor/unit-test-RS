@@ -4,6 +4,19 @@ const Tests = mongoose.model('tests');
 const Photos = mongoose.model('photos');
 const Teachers = mongoose.model('teachers');
 
+//GET
+module.exports.get_created = async (req, res) => {
+    try {
+        const teacher = await Teachers.findOne({user_id: res.token.user.id}).exec();
+        console.log('created', teacher.created_tests);
+        const tests = await Tests.find({_id: {"$in": teacher.created_tests}}, {_id: true, subscribers: true, created_at: true, name: true, state: true}).exec();
+        return res.send({status: 200, response: tests})
+    } catch (error) {
+        console.error('tests.get_created', error);
+        res.send({status: 500, error: {error_msg: JSON.stringify(error)}});
+    }
+}
+
 //POST
 module.exports.create = async (req, res) => {
     try {
@@ -64,7 +77,7 @@ module.exports.create = async (req, res) => {
                 }
             }
         }
-        await Teachers.findOneAndUpdate({user_id: res.token.user.id}, {"$push": {created_tests: {id: test._id}}}).exec();
+        await Teachers.findOneAndUpdate({user_id: res.token.user.id}, {"$push": {created_tests: test._id}}).exec();
         return res.send({status: 200, response: [{test_id: test._id}]}); 
     } catch (error) {
         console.error('tests.create', error);

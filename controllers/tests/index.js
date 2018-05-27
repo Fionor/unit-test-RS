@@ -15,11 +15,30 @@ module.exports.get_created = (req, res) => {
     }
 }
 
+//GET
+module.exports.get_one = (req, res) => {
+    switch (String(req.query.v)) {
+        case '1':
+            validator({req_type: 'GET', for_auth: true, for_role: 'teacher',
+                variables: [
+                    {
+                        parametr: 'id',
+                        type: 'objectid'
+                    }
+                ]
+            }, req, res, version1.get_one);
+        break;
+        default:
+            return res.send({status: 400, error: {error_msg: "invalid version"}});
+        break;
+    }
+}
+
 // POST
 module.exports.create = (req, res) => {
     switch (String(req.body.v)) {
         case '1':
-            validator({req_type: 'POST', for_auth: true,
+            validator({req_type: 'POST', for_auth: true, for_role: 'teacher',
                 variables: [
                     {
                         parametr: 'for_groups',
@@ -37,6 +56,24 @@ module.exports.create = (req, res) => {
                     }
                 ]
             }, req, res, version1.create);
+        break;
+        default:
+            return res.send({status: 400, error: {error_msg: "invalid version"}});
+        break;
+    }
+}
+
+module.exports.remove = (req, res) => {
+    switch (String(req.body.v)) {
+        case '1':
+            validator({req_type: 'POST', for_auth: true, for_role: 'teacher',
+                variables: [
+                    {
+                        parametr: 'id',
+                        type: 'objectid',
+                    }
+                ]
+            }, req, res, version1.remove);
         break;
         default:
             return res.send({status: 400, error: {error_msg: "invalid version"}});

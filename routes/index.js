@@ -21,7 +21,9 @@ router.post('/users.verification', ctrl_users.verification);
 router.post('/users.recovery', ctrl_users.recovery);
 
 router.get('/tests.get_created', ctrl_tests.get_created);
-router.post('/tests.create', ctrl_tests.create);
+router.get('/tests.get_one', ctrl_tests.get_one);
+router.post('/tests.save', ctrl_tests.create);
+router.post('/tests.remove', ctrl_tests.remove);
 router.post('/tests.begin_testing', ctrl_tests.begin_testing);
 router.post('/tests.end_testing', ctrl_tests.end_testing);
 

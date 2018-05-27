@@ -8,11 +8,26 @@ const Teachers = mongoose.model('teachers');
 module.exports.get_created = async (req, res) => {
     try {
         const teacher = await Teachers.findOne({user_id: res.token.user.id}).exec();
-        console.log('created', teacher.created_tests);
         const tests = await Tests.find({_id: {"$in": teacher.created_tests}}, {_id: true, subscribers: true, created_at: true, name: true, state: true}).exec();
         return res.send({status: 200, response: tests})
     } catch (error) {
         console.error('tests.get_created', error);
+        res.send({status: 500, error: {error_msg: JSON.stringify(error)}});
+    }
+}
+
+//GET
+module.exports.get_one = async (req, res) => {
+    try {
+        const test = await Tests.findOne({_id: req.query.id}).exec();
+        const teacher = await Teachers.findOne({user_id: res.token.user.id}).exec();
+        if(teacher.created_tests.indexOf(test.id) != -1){
+            return res.send({status: 200, response: [test]})
+        } else {
+            return res.send({status: 400, errors: [{error_msg: 'invalid test id or permissions denied'}]})
+        }
+    } catch (error) {
+        console.error('tests.get_one', error);
         res.send({status: 500, error: {error_msg: JSON.stringify(error)}});
     }
 }
@@ -60,8 +75,20 @@ module.exports.create = async (req, res) => {
         if (errors.length != 0) {
             return res.send({status: 400, errors: errors});
         }
-    
-        const test = await Tests.create({name: req.body.name, for_groups: req.body.for_groups, variants: req.body.variants});
+        let test;
+        if(!req.body._id) {
+            test = await Tests.create({name: req.body.name, for_groups: req.body.for_groups, variants: req.body.variants});
+            await Teachers.findOneAndUpdate({user_id: res.token.user.id}, {"$push": {created_tests: test._id}}).exec();
+            
+        }
+        else {
+            if(!ObjectId.isValid(req.body._id)) return res.send({status: 400, errors: [{error_msg: 'invalid test id'}]});
+            test = await Tests.findById(req.body._id).exec();
+            test.name = req.body.name,
+            test.for_groups = req.body.for_groups;
+            test.variants = req.body.variants;
+            await test.save();
+        }
         for (let i = 0; i < test.variants.length; i++) {
             for (let j = 0; j < test.variants[i].questions.length; j++) {
                 if(test.variants[i].questions[j].image_id != ''){
@@ -77,11 +104,30 @@ module.exports.create = async (req, res) => {
                 }
             }
         }
-        await Teachers.findOneAndUpdate({user_id: res.token.user.id}, {"$push": {created_tests: test._id}}).exec();
         return res.send({status: 200, response: [{test_id: test._id}]}); 
     } catch (error) {
         console.error('tests.create', error);
         res.send({status: 500, error: {error_msg: error}});
+    }
+}
+
+//POST
+module.exports.remove = async (req, res) => {
+    try {
+        const test = await Tests.findById(req.body.id).exec();
+        if(!test) return res.send({status: 400, errors: [{error_msg: 'invalid test id'}]});
+        if(test.state == 'not_defined'){
+            await test.remove();
+            let teacher = await Teachers.findOne({user_id: res.token.user.id}).exec();
+            teacher.created_tests = teacher.created_tests.filter(test_id => test_id != req.body.id);
+            await teacher.save();
+            return res.send({status: 200, response: []});
+        } else {
+            return res.send({status: 400, errors: [{error_msg: 'invalid test state'}]});
+        }
+    } catch (error) {
+        console.error('tests.remove', error);
+        res.send({status: 500, error: {error_msg: JSON.stringify(error)}});
     }
 }
 

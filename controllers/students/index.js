@@ -1,6 +1,20 @@
 const version1 = require('./versions/v1');
 const validator = require('../../validator/');
 
+//GET
+module.exports.get_avaliable_test = (req, res) => {
+    switch (String(req.query.v)) {
+        case '1':
+            validator({req_type: 'GET', for_auth: true, for_role: 'student',
+                variables: []
+            }, req, res, version1.get_avaliable_test);
+        break;
+        default:
+            return res.send({status: 400, error: {error_msg: "invalid version"}});
+        break;
+    }
+}
+
 //POST
 module.exports.set_answer = (req, res) => {
     switch ( String(req.body.v) ) {

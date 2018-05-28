@@ -30,6 +30,7 @@ router.post('/tests.end_testing', ctrl_tests.end_testing);
 router.get('/photos.get', ctrl_photos.get);
 router.post('/photos.create', upload.fields([{name: 'photo'}]), ctrl_photos.create);
 
+router.get('/students.get_avaliable_test', ctrl_students.get_avaliable_test);
 router.post('/students.begin_testing', ctrl_students.begin_testing);
 router.post('/students.set_answer', ctrl_students.set_answer);
 

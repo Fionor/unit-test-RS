@@ -1,6 +1,25 @@
 const mongoose = require('mongoose');
 const Tests = mongoose.model('tests');
 const Students = mongoose.model('students');
+const Teachers = mongoose.model('teachers');
+const Users = mongoose.model('users');
+
+//GET
+module.exports.get_avaliable_test = async (req, res) => {
+    try {
+        const student = await Students.findOne({user_id: res.token.user.id}).exec();
+        const tests = await Tests.find({for_groups: String(student.group_id), state: 'in_progress', subscribers: {$nin: [res.token.user.id]}}).exec();
+        let response = await Promise.all(tests.map(async test => {
+            const teacher = await Teachers.findOne({created_tests: test._id}).exec();
+            const user = await Users.findById(teacher.user_id);
+            return {created_at: test.created_at, name: test.name, teacher: user.fio}
+        }));
+        res.send({status: 200, response})
+    } catch (error) {
+        console.log('students.set_answer', error);
+        res.send({status: 500, error: {error_msg: error}})
+    }
+}
 
 // POST
 module.exports.set_answer = async (req, res) => {

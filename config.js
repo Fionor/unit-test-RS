@@ -8,7 +8,7 @@ module.exports = {
     },
     resourse_server: {
         port: 3000,
-        db_uri: 'mongodb://localhost:27017/unit-test-rs',
+        db_uri: '',
         url: '127.0.0.1'
     },
     oauth: {

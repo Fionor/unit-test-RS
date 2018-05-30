@@ -2,11 +2,7 @@ const mongoose = require('mongoose');
 const config = require('./config');
 
 let db_uri;
-if (process.env.NODE_ENV === 'production') {
-    db_uri = process.env.MONGO_URI;
-} else {
-    db_uri = config.resourse_server.db_uri;
-}
+db_uri = process.env.DB_URI;
 
 mongoose.connect(db_uri); 
 

@@ -179,7 +179,7 @@ module.exports.get_next_step = async (req, res) => {
             return res.send({status: 400, errors: [{error_msg: 'invalid teacher group'}]});
         }
         if(test.subscribers.indexOf(student.user_id) == -1) {
-            return res.send({status: 200, response: [{status: 'not_begined'}]});
+            return res.send({status: 200, response: [{status: 'not_begined', variants_count: test.variants.length}]});
         }
         const student_subscribe = student.testsSubscribes.filter(subs => subs.test_id == req.query.id)[0];
         if(test.state == 'complited' || student_subscribe.questions.length == test.variants[student_subscribe.variant].questions.length){

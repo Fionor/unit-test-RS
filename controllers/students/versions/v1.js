@@ -16,6 +16,50 @@ module.exports.get_avaliable_test = async (req, res) => {
         }));
         res.send({status: 200, response})
     } catch (error) {
+        console.log('students.get_avaliable_test', error);
+        res.send({status: 500, error: {error_msg: error}})
+    }
+}
+
+//GET
+module.exports.get_complited_tests = async (req, res) => {
+    try {
+        const student = await Students.findOne({user_id: res.token.user.id}).exec();
+        let response = []
+        await Promise.all(student.testsSubscribes.map(async test => {
+            if(test.test_complited == true) {
+                const created_test = await Tests.findById(test.test_id).exec();
+                
+                const teacher = await Teachers.findOne({created_tests: test.test_id}).exec();
+                const user = await Users.findById(teacher.user_id).exec();
+                response.push({id: test.test_id, created_at: created_test.created_at, name: created_test.name, teacher: user.fio});
+            }
+        }));
+        
+        res.send({status: 200, response})
+    } catch (error) {
+        console.log('students.get_complited_tests', error);
+        res.send({status: 500, error: {error_msg: error}})
+    }
+}
+
+//GET
+module.exports.get_in_progress_tests = async (req, res) => {
+    try {
+        const student = await Students.findOne({user_id: res.token.user.id}).exec();
+        let response = []
+        await Promise.all(student.testsSubscribes.map(async test => {
+            if(test.test_complited == false) {
+                const created_test = await Tests.findById(test.test_id).exec();
+                
+                const teacher = await Teachers.findOne({created_tests: test.test_id}).exec();
+                const user = await Users.findById(teacher.user_id).exec();
+                response.push({id: test.test_id, created_at: created_test.created_at, name: created_test.name, teacher: user.fio});
+            }
+        }));
+        
+        res.send({status: 200, response})
+    } catch (error) {
         console.log('students.set_answer', error);
         res.send({status: 500, error: {error_msg: error}})
     }

@@ -15,6 +15,34 @@ module.exports.get_avaliable_test = (req, res) => {
     }
 }
 
+//GET
+module.exports.get_complited_tests = (req, res) => {
+    switch (String(req.query.v)) {
+        case '1':
+            validator({req_type: 'GET', for_auth: true, for_role: 'student',
+                variables: []
+            }, req, res, version1.get_complited_tests);
+        break;
+        default:
+            return res.send({status: 400, error: {error_msg: "invalid version"}});
+        break;
+    }
+}
+
+//GET
+module.exports.get_in_progress_tests = (req, res) => {
+    switch (String(req.query.v)) {
+        case '1':
+            validator({req_type: 'GET', for_auth: true, for_role: 'student',
+                variables: []
+            }, req, res, version1.get_in_progress_tests);
+        break;
+        default:
+            return res.send({status: 400, error: {error_msg: "invalid version"}});
+        break;
+    }
+}
+
 //POST
 module.exports.set_answer = (req, res) => {
     switch ( String(req.body.v) ) {

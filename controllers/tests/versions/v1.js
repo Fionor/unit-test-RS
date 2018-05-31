@@ -197,7 +197,7 @@ module.exports.get_next_step = async (req, res) => {
             delete answer.right;
             return answer;
         })
-        res.send({status:200, response: [next_question]});
+        res.send({status:200, response: [{status: 'testing', question: next_question}]});
     } catch (error) {
         console.error('tests.get_next_step', error);
         res.send({status: 500, error: {error_msg: JSON.stringify(error)}});

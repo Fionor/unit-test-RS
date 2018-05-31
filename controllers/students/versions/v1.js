@@ -12,7 +12,7 @@ module.exports.get_avaliable_test = async (req, res) => {
         let response = await Promise.all(tests.map(async test => {
             const teacher = await Teachers.findOne({created_tests: test._id}).exec();
             const user = await Users.findById(teacher.user_id);
-            return {created_at: test.created_at, name: test.name, teacher: user.fio}
+            return {id: test._id, created_at: test.created_at, name: test.name, teacher: user.fio}
         }));
         res.send({status: 200, response})
     } catch (error) {

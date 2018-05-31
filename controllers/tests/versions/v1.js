@@ -3,6 +3,7 @@ const ObjectId = mongoose.mongo.ObjectId;
 const Tests = mongoose.model('tests');
 const Photos = mongoose.model('photos');
 const Teachers = mongoose.model('teachers');
+const Students = mongoose.model('students');
 
 //GET
 module.exports.get_created = async (req, res) => {
@@ -166,6 +167,39 @@ module.exports.end_testing = async (req, res) => {
         }
     } catch (error) {
         console.error('tests.end_testing', error);
+        res.send({status: 500, error: {error_msg: JSON.stringify(error)}});
+    }
+}
+
+module.exports.get_next_step = async (req, res) => {
+    try {
+        const student = await Students.findOne({user_id: res.token.user.id});
+        const test = await Tests.findById(req.query.id).exec();
+        if(test.for_groups.indexOf(String(student.group_id)) == -1) {
+            return res.send({status: 400, errors: [{error_msg: 'invalid teacher group'}]});
+        }
+        if(test.subscribers.indexOf(student.user_id) == -1) {
+            return res.send({status: 200, response: [{status: 'not_begined'}]});
+        }
+        const student_subscribe = student.testsSubscribes.filter(subs => subs.test_id == req.query.id)[0];
+        if(test.state == 'complited' || student_subscribe.questions.length == test.variants[student_subscribe.variant].questions.length){
+            student.testsSubscribes = student.testsSubscribes.map(subs => {
+                if(subs.test_id == req.query.id){
+                    subs.test_complited = true;
+                }
+                return subs;
+            })
+            await student.save();
+            return res.send({status: 200, response:[{status: 'complited'}]})
+        }
+        const next_question = test.variants[student_subscribe.variant].questions[student_subscribe.questions.length];
+        next_question.answers.map(answer => {
+            delete answer.right;
+            return answer;
+        })
+        res.send({status:200, response: [next_question]});
+    } catch (error) {
+        console.error('tests.get_next_step', error);
         res.send({status: 500, error: {error_msg: JSON.stringify(error)}});
     }
 }

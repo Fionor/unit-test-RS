@@ -34,6 +34,25 @@ module.exports.get_one = (req, res) => {
     }
 }
 
+//GET
+module.exports.get_next_step = (req, res) => {
+    switch (String(req.query.v)) {
+        case '1':
+            validator({req_type: 'GET', for_auth: true, for_role: 'student',
+                variables: [
+                    {
+                        parametr: 'id',
+                        type: 'objectid'
+                    }
+                ]
+            }, req, res, version1.get_next_step);
+        break;
+        default:
+            return res.send({status: 400, error: {error_msg: "invalid version"}});
+        break;
+    }
+}
+
 // POST
 module.exports.create = (req, res) => {
     switch (String(req.body.v)) {

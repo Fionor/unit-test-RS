@@ -4,6 +4,7 @@ const Tests = mongoose.model('tests');
 const Photos = mongoose.model('photos');
 const Teachers = mongoose.model('teachers');
 const Students = mongoose.model('students');
+const Users = mongoose.model('users');
 
 //GET
 module.exports.get_created = async (req, res) => {
@@ -202,4 +203,46 @@ module.exports.get_next_step = async (req, res) => {
         console.error('tests.get_next_step', error);
         res.send({status: 500, error: {error_msg: JSON.stringify(error)}});
     }
+}
+
+module.exports.get_users_statistic = (student_id, test_id) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const student = await Students.findOne({user_id: student_id}).exec();
+            const test = await Tests.findById(test_id).exec();
+            const user = await Users.findById(student_id).exec();
+            let questions = [];
+            const subscribed_test = student.testsSubscribes.filter(test => test.test_id == test_id)[0];
+            for (let i = 0; i < test.variants[subscribed_test.variant].questions.length; i++) {
+                if(subscribed_test.questions[i] != undefined){
+                    const name = test.variants[subscribed_test.variant].questions[i].name;
+                    const text = test.variants[subscribed_test.variant].questions[i].answers[Number(subscribed_test.questions[i])].text;
+                    const right = test.variants[subscribed_test.variant].questions[i].answers[Number(subscribed_test.questions[i])].right;
+                    questions.push({name, text, right});
+                }
+            }
+            const trueQuestions = questions.reduce((acc, qu) => {
+                if(qu.right == true){
+                    return ++acc;
+                }
+                else{
+                    return acc;
+                }
+            }, 0);
+            const success = (trueQuestions/test.variants[subscribed_test.variant].questions.length*100).toFixed(2);
+            console.log('fio', user.fio)
+
+            resolve({
+                user_student_id: student.user_id,
+                fio: user.fio,
+                questions,
+                true_answers: trueQuestions,
+                success,
+                variant: subscribed_test.variant
+            });
+        } catch (error) {
+            console.error('tests.get_users_statistic', error);
+            res.send({status: 500, error: {error_msg: JSON.stringify(error)}});
+        }
+    })
 }

@@ -141,3 +141,29 @@ module.exports.end_testing = (req, res) => {
     }
     
 }
+
+module.exports.get_users_statistic = (req, res) => {
+    switch (String(req.query.v)) {
+        case '1':
+            validator({req_type: 'GET', for_auth: true,
+                variables: [
+                    {
+                        parametr: 'test_id',
+                        type: 'objectid',
+                    },
+                    {
+                        parametr: 'student_id',
+                        type: 'objectid',
+                    }
+                ]
+            }, req, res, null).then(data => {
+                version1.get_users_statistic(req.query.student_id, req.query.test_id).then(result => {
+                    res.send({status: 200, response: [result]})
+                })
+            });
+        break;
+        default:
+            return res.send({status: 400, error: {error_msg: "invalid version"}});
+        break;
+    }
+}

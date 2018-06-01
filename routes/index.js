@@ -23,6 +23,7 @@ router.post('/users.recovery', ctrl_users.recovery);
 router.get('/tests.get_created', ctrl_tests.get_created);
 router.get('/tests.get_one', ctrl_tests.get_one);
 router.get('/tests.get_next_step', ctrl_tests.get_next_step);
+router.get('/tests.get_users_statistic', ctrl_tests.get_users_statistic)
 router.post('/tests.save', ctrl_tests.create);
 router.post('/tests.remove', ctrl_tests.remove);
 router.post('/tests.begin_testing', ctrl_tests.begin_testing);

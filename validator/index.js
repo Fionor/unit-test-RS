@@ -39,6 +39,7 @@ module.exports =  (params, req, res, callback = (req, res) => {}) => {
                 } else {
                     return res.send({status: 401, error: {error_msg: 'invalid_token'}});
                 }
+                
             }
             for1: for (let i = 0; i < params.variables.length; i++) {
                 const element = params.variables[i];
@@ -148,10 +149,10 @@ module.exports =  (params, req, res, callback = (req, res) => {}) => {
                 return res.send({status: 400, errors});
             } else {
                 if(callback) callback(req, res);
-                resolve({user: check_token.response[0].user, req: req});
+                resolve(res.token);
             }
         } catch (error) {
-            console.error('validator ERROR', JSON.stringify(error));
+            console.error('validator ERROR', error);
         }
     })
 }

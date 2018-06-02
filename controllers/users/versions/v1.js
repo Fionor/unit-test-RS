@@ -34,13 +34,17 @@ module.exports.get = async (req, res) => {
     
 }
 
-module.exports.get_offset_users = (offset, count) => {
+module.exports.get_offset_users = (offset, count, fio) => {
     return new Promise(async (resolve, reject) => {
         try {
             offset = Number(offset);
             count = Number(count);
-            const users_count = await User.find({verified: true}).count().exec();
-            let users = await User.find({verified: true}).limit(count).skip(offset).exec();
+            let regex_patern = new RegExp(/.*/);
+            if(fio && fio.length >= 3) regex_patern = new RegExp(fio.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').trim());
+
+            const users_count = await User.find({verified: true, fio: { $regex: regex_patern, $options: 'i'}}).count().exec();
+            
+            let users = await User.find({verified: true, fio: { $regex: regex_patern, $options: 'i'}}).limit(count).skip(offset).exec();
             users = await Promise.all(users.map(async user => {
                 let new_user_object = {fio: user.fio, id: user.id, role: user.role};
                 if(user.role == 'student') {

@@ -43,7 +43,7 @@ module.exports.get_offset_users = (req, res) => {
                 if(req.query.offset < 0) errors.push({error_msg: 'invalid offset (>= 0)'});
                 if(errors.length > 0) return res.send({status: 400, errors});
 
-                version1.get_offset_users(req.query.offset, req.query.count).then(result => {
+                version1.get_offset_users(req.query.offset, req.query.count, req.query.fio).then(result => {
                     res.send({status: 200, response: result.users, meta: {users_count: result.users_count}})
                 })
             });

@@ -220,9 +220,10 @@ module.exports.get_users_statistic = (student_id, test_id) => {
             for (let i = 0; i < test.variants[subscribed_test.variant].questions.length; i++) {
                 if(subscribed_test.questions[i] != undefined){
                     const name = test.variants[subscribed_test.variant].questions[i].name;
+                    const image_id = test.variants[subscribed_test.variant].questions[i].image_id;
                     const text = test.variants[subscribed_test.variant].questions[i].answers[Number(subscribed_test.questions[i])].text;
                     const right = test.variants[subscribed_test.variant].questions[i].answers[Number(subscribed_test.questions[i])].right;
-                    questions.push({name, text, right});
+                    questions.push({name, image_id, text, right});
                 }
             }
             const trueQuestions = questions.reduce((acc, qu) => {

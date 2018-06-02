@@ -22,16 +22,16 @@ module.exports =  (params, req, res, callback = (req, res) => {}) => {
                         return res.send(check_token);
                     }
                     if( !check_token.response[0].user.verified ){
-                        return res.send({status: 401, error: {error_msg: 'user is not verified'}})
+                        return res.send({status: 402, error: {error_msg: 'user is not verified'}})
                     }
                     if(params.for_role && check_token.response[0].user.role != params.for_role){
-                        return res.send({status: 401, error: {error_msg: 'invalid role'}})
+                        return res.send({status: 402, error: {error_msg: 'invalid role'}})
                     }
                     if(params.permissions) {
                         for (let i = 0; i < params.permissions.length; i++) {
                             const permission = params.permissions[i];
                             if( Number(check_token.response[0].user.admin_scope & permission) != permission) {
-                                return res.send({status: 401, error: {error_msg: 'permission denied'}})
+                                return res.send({status: 402, error: {error_msg: 'permission denied'}})
                             }
                         }
                     }

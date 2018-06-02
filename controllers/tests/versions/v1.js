@@ -177,10 +177,11 @@ module.exports.get_next_step = async (req, res) => {
         const student = await Students.findOne({user_id: res.token.user.id});
         const test = await Tests.findById(req.query.id).exec();
         if(test.for_groups.indexOf(String(student.group_id)) == -1) {
-            return res.send({status: 400, errors: [{error_msg: 'invalid teacher group'}]});
+            return res.send({status: 400, errors: [{error_msg: 'invalid student group'}]});
         }
         if(test.subscribers.indexOf(student.user_id) == -1) {
-            return res.send({status: 200, response: [{status: 'not_begined', variants_count: test.variants.length}]});
+            if(test.state == 'complited')  res.send({status: 400, errors: [{error_msg: 'test complited'}]});
+            else return res.send({status: 200, response: [{status: 'not_begined', variants_count: test.variants.length}]});
         }
         const student_subscribe = student.testsSubscribes.filter(subs => subs.test_id == req.query.id)[0];
         if(test.state == 'complited' || student_subscribe.questions.length == test.variants[student_subscribe.variant].questions.length){

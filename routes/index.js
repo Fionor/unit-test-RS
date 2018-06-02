@@ -10,6 +10,7 @@ const ctrl_photos = require('../controllers/photos/');
 const ctrl_groups = require('../controllers/groups');
 
 router.get('/users.get', ctrl_users.get);
+router.get('/users.get_offset_users', ctrl_users.get_offset_users);
 router.get('/users.password_check', ctrl_users.password_check);
 router.get('/users.get_unverified_users', ctrl_users.get_unverified_users);
 router.get('/users.get_recovery_password_status', ctrl_users.get_recovery_password_status);

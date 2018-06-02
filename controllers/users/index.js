@@ -21,6 +21,39 @@ module.exports.get = (req, res) => {
     }
 }
 
+// GET
+module.exports.get_offset_users = (req, res) => {
+    switch (String(req.query.v)) {
+        case '1':
+            validator({req_type: 'GET', for_auth: true, permissions: [config.admin_permissions.ACCESS_ADMIN],
+                variables: [
+                    {
+                        parametr: 'offset',
+                        type: 'string'
+                    },
+                    {
+                        parametr: 'offset',
+                        type: 'string'
+                    }
+                ]
+            }, req, res, null).then(data => {
+                
+                let errors = []
+                if(req.query.count < 1) errors.push({error_msg: 'invalid count (>= 1)'});
+                if(req.query.offset < 0) errors.push({error_msg: 'invalid offset (>= 0)'});
+                if(errors.length > 0) return res.send({status: 400, errors});
+
+                version1.get_offset_users(req.query.offset, req.query.count).then(result => {
+                    res.send({status: 200, response: result.users, meta: {users_count: result.users_count}})
+                })
+            });
+        break;
+        default:
+            return res.send({status: 400, error: {error_msg: "invalid version"}});
+        break;
+    }
+}
+
 //GET
 module.exports.get_recovery_password_status = (req, res) => {
     switch (String(req.query.v)) {

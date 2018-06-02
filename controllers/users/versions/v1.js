@@ -34,6 +34,30 @@ module.exports.get = async (req, res) => {
     
 }
 
+module.exports.get_offset_users = (offset, count) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            offset = Number(offset);
+            count = Number(count);
+            const users_count = await User.find({verified: true}).count().exec();
+            let users = await User.find({verified: true}).limit(count).skip(offset).exec();
+            users = await Promise.all(users.map(async user => {
+                let new_user_object = {fio: user.fio, id: user.id, role: user.role};
+                if(user.role == 'student') {
+                    const student = await Student.findOne({user_id: user._id}).exec();
+                    const group = await Group.findById(student.group_id).exec();
+                    new_user_object.group = group.name;
+                }
+                return new_user_object;
+            }))
+            resolve({users, users_count});
+        } catch (error) {
+            console.error('users.get', error);
+            reject(error)
+        }
+    })
+}
+
 //GET
 module.exports.get_recovery_password_status = async (req, res) => {
     try {

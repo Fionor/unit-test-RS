@@ -191,7 +191,9 @@ module.exports.get_next_step = async (req, res) => {
                 return subs;
             })
             await student.save();
-            return res.send({status: 200, response:[{status: 'complited'}]})
+            let get_users_statistic =  require('./v1').get_users_statistic;
+            const stats = await get_users_statistic(student.user_id, test._id)
+            return res.send({status: 200, response:[{status: 'complited', stats}]})
         }
         const next_question = test.variants[student_subscribe.variant].questions[student_subscribe.questions.length];
         next_question.answers.map(answer => {
@@ -212,7 +214,9 @@ module.exports.get_users_statistic = (student_id, test_id) => {
             const test = await Tests.findById(test_id).exec();
             const user = await Users.findById(student_id).exec();
             let questions = [];
-            const subscribed_test = student.testsSubscribes.filter(test => test.test_id == test_id)[0];
+            const subscribed_test = student.testsSubscribes.filter(test => String(test.test_id) == String(test_id))[0];
+            console.log(subscribed_test);
+            
             for (let i = 0; i < test.variants[subscribed_test.variant].questions.length; i++) {
                 if(subscribed_test.questions[i] != undefined){
                     const name = test.variants[subscribed_test.variant].questions[i].name;
@@ -230,7 +234,6 @@ module.exports.get_users_statistic = (student_id, test_id) => {
                 }
             }, 0);
             const success = (trueQuestions/test.variants[subscribed_test.variant].questions.length*100).toFixed(2);
-            console.log('fio', user.fio)
 
             resolve({
                 user_student_id: student.user_id,
@@ -242,7 +245,7 @@ module.exports.get_users_statistic = (student_id, test_id) => {
             });
         } catch (error) {
             console.error('tests.get_users_statistic', error);
-            res.send({status: 500, error: {error_msg: JSON.stringify(error)}});
+            reject(error)
         }
     })
 }

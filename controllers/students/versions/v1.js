@@ -95,7 +95,7 @@ module.exports.set_answer = async (req, res) => {
         get_user_statistic(student.user_id, test._id).then((statistic) => {
             request({
                 method: 'POST',
-                url: `http://${config.push_service.url}${config.push_service.port ? `:${config.resourse_server.port}` : ''}/push.send`,
+                url: `http://${config.push_service.url}${config.push_service.port ? `:${config.push_service.port}` : ''}/push.send`,
                 json: {statistic, room: test._id}
             })
         });

@@ -15,6 +15,10 @@ module.exports = {
         port: 3001,
         url: '127.0.0.1'
     },
+    push_service: {
+        url: '127.0.0.1',
+        port: 3002
+    }
 }
 
 /*--------------------

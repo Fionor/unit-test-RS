@@ -1,8 +1,11 @@
+const request = require('request-promise');
 const mongoose = require('mongoose');
 const Tests = mongoose.model('tests');
 const Students = mongoose.model('students');
 const Teachers = mongoose.model('teachers');
 const Users = mongoose.model('users');
+const config = require('../../../config');
+const get_user_statistic = require('../../tests/versions/v1').get_users_statistic;
 
 //GET
 module.exports.get_avaliable_test = async (req, res) => {
@@ -89,7 +92,13 @@ module.exports.set_answer = async (req, res) => {
         }
         await Students.findOneAndUpdate({user_id:  res.token.user.id, "testsSubscribes.test_id": req.body.test_id}, {"$push": {"testsSubscribes.$.questions": req.body.answer}}).lean().exec();        
         let variant;
-        
+        const statistic = get_user_statistic(student.user_id, test.id).then(() => {
+            request({
+                method: 'POST',
+                url: `http://${config.resourse_server.url}${config.resourse_server.port ? `:${config.resourse_server.port}` : ''}/push.send`,
+                json: {statistic, room: test._id}
+            })
+        });
         //const newStatistic = await getStatistic( res.token.id, req.body.test_id);
         //io.to(req.body.test_id).emit('updateStatistic', {...newStatistic});
         res.send({status: 200, response: []});
